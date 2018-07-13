@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/kevinkiklee/forgetchat/issues"
   },
-  "homepage": "https://github.com/kevinkiklee/forgetchat#readme"
+  "homepage": "https://github.com/kevinkiklee/forgetchat#readme",
+  "devDependencies": {
+    "eslint": "^5.1.0"
+  }
 }
