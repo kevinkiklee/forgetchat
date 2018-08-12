@@ -6,7 +6,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: __dirname + '/dist',
-    publicPath: '/',
+    publicPath: '/client',
     filename: 'app.js'
   },
   module: {
@@ -31,11 +31,13 @@ module.exports = {
   },
   devServer: {
     contentBase: './src',
+    port: 3001
   },
   plugins: [
     new HtmlWebPackPlugin({
       template: "./src/index.html",
-      filename: "./index.html"
+      filename: "./index.html",
+      minify: true
     })
   ],
   optimization: {
@@ -44,7 +46,7 @@ module.exports = {
         cache: true,
         parallel: true,
         uglifyOptions: {
-          compress: false,
+          compress: true,
           ecma: 6,
           mangle: true
         },
