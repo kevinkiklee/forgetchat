@@ -1,14 +1,22 @@
 const express = require('express')
 const path = require('path')
+const fs = require('fs')
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT || 3000
 const app = express()
 
 const chats = {}
 
 app.get('/', (req, res) => {
-  const staticPage = path.join(__dirname, './index.html')
-  res.sendFile(staticPage)
+  const page = path.join(__dirname, './view/index.html')
+  console.log(`GET / - SUCCESS - Index served`)
+  res.sendFile(page)
+})
+
+app.get('/client/:fileName', (req, res) => {
+  const file = path.join(__dirname, `../../client/dist/${req.params.fileName}`)
+  console.log(`GET /client/:fileName - SUCCESS - ${file} served`)
+  res.sendFile(file)
 })
 
 app.get('/api/lock/:chatId', (req, res) => {
@@ -16,9 +24,9 @@ app.get('/api/lock/:chatId', (req, res) => {
 
   if (chats[chatId]) {
     chats[chatId].locked = true
-    res.send(`GET /api/lock/:chatId - ${chatId} locked`)
+    console.log(`GET /api/lock/:chatId - SUCCESS - ${chatId} locked`)
   } else {
-    res.send(`GET /api/lock/:chatId - ${chatId} does not exist`)
+    console.log(`GET /api/lock/:chatId - ERROR - ${chatId} does not exist`)
   }
 })
 
@@ -31,20 +39,27 @@ app.get('/api/create', (req, res) => {
     locked: false,
   }
 
-  console.log(`${chatId} created`);
-
-  res.send(`GET /api/create - ${chatId} created`)
+  console.log(`GET /api/create - SUCCESS - ${chatId} created`)
+  res.send(`GET /api/create - SUCCESS - ${chatId} created`)
 })
 
 app.get('/:chatId', (req, res) => {
-  const chatId = req.params.chatId
+  const { chatId } = req.params
 
   if (chats[chatId]) {
-    console.log(`GET - ${chatId}`);
-    const staticPage = path.join(__dirname, './test.html')
-    res.sendFile(staticPage)
+    const clientPath = path.join(__dirname, '../../client/dist/index.html')
+
+    fs.readFile(clientPath, 'utf8', function read(error, html) {
+      if (error) {
+        throw error
+      }
+
+      console.log(`GET /:chatId - SUCCESS - ${chatId} served`)
+      res.send(html.replace(/CHAT_ID/g, chatId))
+    })
   } else {
-    res.send(`GET /:chatId - ${chatId} does not exist`)
+    console.log(`GET /:chatId - ERROR - ${chatId} does not exist`)
+    res.send(`GET /:chatId - ERROR - ${chatId} does not exist`)
   }
 })
 
@@ -53,7 +68,7 @@ app.listen(PORT, error => {
     console.error(error)
   }
 
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`)
 })
 
 
