@@ -1,9 +1,6 @@
-console.log('nothing.chat - client')
-
 import React from 'react';
 import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App';
 
-ReactDOM.render(
-  <div>nothing.chat</div>,
-  document.getElementById('app')
-);
+ReactDOM.render(<App />, document.getElementById('root'));

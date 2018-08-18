@@ -4,7 +4,7 @@ const path = require('path')
 const express = require('express')
 
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 3001
 const app = express()
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
@@ -50,12 +50,13 @@ app.get('/api/create', (req, res) => {
 app.get('/abc', (req, res) => {
   // const { chatId } = req.params
   const chatId = 'abc'
-  if (chats[chatId]) {
+  // if (chats[chatId]) {
+  if (true) {
     let clientPath
-    if (!process.env.PRODUCTION) {
-      clientPath = path.join(__dirname, '../../client/dist/index.html')
+    if (process.env.NODE_ENV !== 'PRODUCTION') {
+      clientPath = path.join(__dirname, '../../client/public/index.html')
     } else {
-      clientPath = 'http://localhost:3001'
+      clientPath = 'http://localhost:3000'
     }
 
     fs.readFile(clientPath, 'utf8', function read(error, html) {
