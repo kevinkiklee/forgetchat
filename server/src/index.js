@@ -1,9 +1,13 @@
-const express = require('express')
-const path = require('path')
 const fs = require('fs')
+const path = require('path')
+
+const express = require('express')
+
 
 const PORT = process.env.PORT || 3000
 const app = express()
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
 const chats = {}
 
@@ -43,11 +47,16 @@ app.get('/api/create', (req, res) => {
   res.send(`GET /api/create - SUCCESS - ${chatId} created`)
 })
 
-app.get('/:chatId', (req, res) => {
-  const { chatId } = req.params
-
+app.get('/abc', (req, res) => {
+  // const { chatId } = req.params
+  const chatId = 'abc'
   if (chats[chatId]) {
-    const clientPath = path.join(__dirname, '../../client/dist/index.html')
+    let clientPath
+    if (!process.env.PRODUCTION) {
+      clientPath = path.join(__dirname, '../../client/dist/index.html')
+    } else {
+      clientPath = 'http://localhost:3001'
+    }
 
     fs.readFile(clientPath, 'utf8', function read(error, html) {
       if (error) {
@@ -63,7 +72,7 @@ app.get('/:chatId', (req, res) => {
   }
 })
 
-app.listen(PORT, error => {
+server.listen(PORT, error => {
   if (error) {
     console.error(error)
   }
@@ -71,4 +80,9 @@ app.listen(PORT, error => {
   console.log(`Server running on port ${PORT}`)
 })
 
-
+io.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
+});
