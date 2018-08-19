@@ -6,7 +6,6 @@ class App extends Component {
     return (
       <div className="App">
         <h1>nothing.chat</h1>
-        <p>{window.__nothing__.chatId}</p>
       </div>
     );
   }
