@@ -1,36 +1,34 @@
-const express = require('express')
 const path = require('path')
-const fs = require('fs')
 
-const PORT = process.env.PORT || 3000
+const express = require('express')
+const io = require('socket.io')
+
 const app = express()
+const server = require('http').Server(app)
+const serverIo = io(server)
 
+const PORT = process.env.PORT || 3001
 const chats = {}
 
+app.use(express.static(path.join(__dirname, '../../client/build')))
+
 app.get('/', (req, res) => {
-  const page = path.join(__dirname, './view/index.html')
   console.log(`GET / - SUCCESS - Index served`)
-  res.sendFile(page)
+  res.sendFile('index.html')
 })
 
-app.get('/client/:fileName', (req, res) => {
-  const file = path.join(__dirname, `../../client/dist/${req.params.fileName}`)
-  console.log(`GET /client/:fileName - SUCCESS - ${file} served`)
-  res.sendFile(file)
-})
-
-app.get('/api/lock/:chatId', (req, res) => {
+app.get('/api/chat/lock/:chatId', (req, res) => {
   const chatId = req.params.chatId
 
   if (chats[chatId]) {
     chats[chatId].locked = true
-    console.log(`GET /api/lock/:chatId - SUCCESS - ${chatId} locked`)
+    console.log(`GET /api/chat/lock/:chatId - SUCCESS - ${chatId} locked`)
   } else {
-    console.log(`GET /api/lock/:chatId - ERROR - ${chatId} does not exist`)
+    console.log(`GET /api/chat/lock/:chatId - ERROR - ${chatId} does not exist`)
   }
 })
 
-app.get('/api/create', (req, res) => {
+app.get('/api/chat/create', (req, res) => {
   const chatId = Math.random().toString(36).slice(2)
 
   chats[chatId] = {
@@ -39,36 +37,24 @@ app.get('/api/create', (req, res) => {
     locked: false,
   }
 
-  console.log(`GET /api/create - SUCCESS - ${chatId} created`)
-  res.send(`GET /api/create - SUCCESS - ${chatId} created`)
-})
+  const chatIo = serverIo.of(`/${chatId}`)
 
-app.get('/:chatId', (req, res) => {
-  const { chatId } = req.params
+  chatIo.on('connection', socket => {
+    chatIo.emit('serverMessage', { fromServer: 'hello' })
 
-  if (chats[chatId]) {
-    const clientPath = path.join(__dirname, '../../client/dist/index.html')
-
-    fs.readFile(clientPath, 'utf8', function read(error, html) {
-      if (error) {
-        throw error
-      }
-
-      console.log(`GET /:chatId - SUCCESS - ${chatId} served`)
-      res.send(html.replace(/CHAT_ID/g, chatId))
+    socket.on('clientMessage', data => {
+      console.log(data)
     })
-  } else {
-    console.log(`GET /:chatId - ERROR - ${chatId} does not exist`)
-    res.send(`GET /:chatId - ERROR - ${chatId} does not exist`)
-  }
+  })
+
+  console.log(`GET /api/chat/create - SUCCESS - ${chatId} created`)
+  res.json({ chatId })
 })
 
-app.listen(PORT, error => {
+server.listen(PORT, error => {
   if (error) {
     console.error(error)
   }
 
   console.log(`Server running on port ${PORT}`)
 })
-
-

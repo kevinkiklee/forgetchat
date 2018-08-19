@@ -9,7 +9,7 @@
     "start:client": "cd client && npm run start",
     "dev": "run-p dev:*",
     "dev:server": "cd server && npm run dev",
-    "dev:client": "cd client && npm run start",
+    "dev:client": "cd client && npm run dev",
     "build": "run-s build:*",
     "build:client": "cd client && npm run build"
   },
