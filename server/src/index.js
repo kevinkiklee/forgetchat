@@ -3,7 +3,6 @@ const path = require('path')
 
 const express = require('express')
 
-
 const PORT = process.env.PORT || 3001
 const app = express()
 const server = require('http').Server(app);
@@ -11,16 +10,11 @@ const io = require('socket.io')(server);
 
 const chats = {}
 
-app.get('/', (req, res) => {
-  const page = path.join(__dirname, './view/index.html')
-  console.log(`GET / - SUCCESS - Index served`)
-  res.sendFile(page)
-})
+app.use(express.static(path.join(__dirname, '../../client/build')));
 
-app.get('/client/:fileName', (req, res) => {
-  const file = path.join(__dirname, `../../client/dist/${req.params.fileName}`)
-  console.log(`GET /client/:fileName - SUCCESS - ${file} served`)
-  res.sendFile(file)
+app.get('/', (req, res) => {
+  console.log(`GET / - SUCCESS - Index served`)
+  res.sendFile('index.html')
 })
 
 app.get('/api/lock/:chatId', (req, res) => {
@@ -47,26 +41,22 @@ app.get('/api/create', (req, res) => {
   res.send(`GET /api/create - SUCCESS - ${chatId} created`)
 })
 
-app.get('/abc', (req, res) => {
-  // const { chatId } = req.params
-  const chatId = 'abc'
-  // if (chats[chatId]) {
-  if (true) {
-    let clientPath
-    if (process.env.NODE_ENV !== 'PRODUCTION') {
-      clientPath = path.join(__dirname, '../../client/public/index.html')
-    } else {
-      clientPath = 'http://localhost:3000'
-    }
+app.get('/test', (req, res) => {
+  const chatId = req.params.chatId
 
-    fs.readFile(clientPath, 'utf8', function read(error, html) {
-      if (error) {
-        throw error
-      }
+  if (chats[chatId]) {
+    res.send('okay')
+  } else {
+    console.log(`GET /:chatId - ERROR - ${chatId} does not exist`)
+    res.send(`GET /:chatId - ERROR - ${chatId} does not exist`)
+  }
+})
 
-      console.log(`GET /:chatId - SUCCESS - ${chatId} served`)
-      res.send(html.replace(/CHAT_ID/g, chatId))
-    })
+app.get('/room/:chatId', (req, res) => {
+  const chatId = req.params.chatId
+
+  if (chats[chatId]) {
+    res.send('okay')
   } else {
     console.log(`GET /:chatId - ERROR - ${chatId} does not exist`)
     res.send(`GET /:chatId - ERROR - ${chatId} does not exist`)
