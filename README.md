@@ -80,10 +80,11 @@ Generates channels on demand and destroys itself when the participants leave.  T
 * Morty receives the message and decrypts it with the shared private key
 
 ## Tasks
+* [x] Setup React skeleton
 * [x] Setup Node skeleton
-* [x] Setup Socket.io skeleton
-* [ ] Finalize what the heck I'm going to use for my frontend
+* [x] Setup Socket.io skeleton ([PR #3](https://github.com/kevinkiklee/nothing.chat/pull/3))
 * [ ] Research JavaScript client-side encryption
+* [ ] Research public key discovery process
 * [ ] Setup HTTPS
 * [ ] Setup WSS (`wss://`)
 * [ ] Research hosting solution
