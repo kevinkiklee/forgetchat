@@ -37,7 +37,7 @@ app.get('/api/chat/create', (req, res) => {
     locked: false,
   }
 
-  const chatIo = serverIo.of('/abc');
+  const chatIo = serverIo.of(`/${chatId}`)
 
   chatIo.on('connection', socket => {
     chatIo.emit('serverMessage', { fromServer: 'hello' })
@@ -48,7 +48,7 @@ app.get('/api/chat/create', (req, res) => {
   })
 
   console.log(`GET /api/chat/create - SUCCESS - ${chatId} created`)
-  res.send(chatId)
+  res.json({ chatId })
 })
 
 server.listen(PORT, error => {
