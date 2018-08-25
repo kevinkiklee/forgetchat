@@ -5,15 +5,18 @@ import io from 'socket.io-client'
 import './app.css'
 import Chat from './Chat'
 
-fetch('/api/chat/create')
-  .then(res => res.json())
-  .then(({ chatId }) => {
-    const socket = io.connect(`/${chatId}`)
+const chatId = window.location.pathname.split('/c/')[1]
 
-    socket.on('serverMessage', function (data) {
-      console.log(data)
-      socket.emit('clientMessage', { fromClient: 'hello' })
+try {
+  fetch(`/api/validate/${chatId}`)
+    .then(res => res.json())
+    .then(({ isValid }) => {
+      if (isValid) {
+        window.socketIo = io.connect(`/${chatId}`)
+
+        ReactDOM.render(<Chat />, document.getElementById('root'))
+      }
     })
-  })
-
-ReactDOM.render(<Chat />, document.getElementById('root'))
+} catch (error) {
+  console.error(error)
+}
