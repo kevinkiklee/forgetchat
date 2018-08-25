@@ -6,23 +6,23 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>nothing.chat homepage</title>
   <link rel="stylesheet" type="text/css" href="./style/index.css">
+</head>
+<body>
+  <h1>nothing.chat</h1>
+  <div class='generate__button'>Generate Room</div>
+  <div class='output__url'></div>
   <script>
     const button = document.querySelector('.generate__button')
     const output = document.querySelector('.output__url')
 
     button.addEventListener('click', event => {
-      fetch('api/create/chat')
+      fetch('api/chat/create')
         .then(res => res.json())
-        .then(chatId => {
-          console.log(chatId)
-          output.innerHTML(`<a href='/c/${chatId}'>${chatId}</a>`)
+        .then(({ chatId }) => {
+          console.log({ chatId })
+          output.innerHTML = `<a href='/c/${chatId}'>${chatId}</a>`
         })
     })
   </script>
-</head>
-<body>
-  <h1>nothing.chat</h1>
-  <div className='generate__button'>Generate Room</div>
-  <div className='output__url'></div>
 </body>
 </html>
