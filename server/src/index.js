@@ -10,21 +10,23 @@ const serverIo = io(server)
 const PORT = process.env.PORT || 3001
 const chats = {}
 
+app.get('/app.html', (req, res) => res.status(403).end('403 Forbidden'))
+
 app.use(express.static(path.join(__dirname, '../../client/build')))
 
-app.get('/', (req, res) => {
-  console.log(`GET / - SUCCESS - Index served`)
-  res.sendFile('index.html')
-})
+app.get('/c/:chatId', (req, res) => {
+  const { chatId } = req.params
 
-app.get('/api/chat/lock/:chatId', (req, res) => {
-  const chatId = req.params.chatId
-
-  if (chats[chatId]) {
-    chats[chatId].locked = true
-    console.log(`GET /api/chat/lock/:chatId - SUCCESS - ${chatId} locked`)
-  } else {
-    console.log(`GET /api/chat/lock/:chatId - ERROR - ${chatId} does not exist`)
+  try {
+    if (chats[chatId]) {
+      const filePath = path.join(__dirname, '../../client/build/app.html')
+      res.sendFile(filePath)
+      console.log(`GET /c/${req.params.chatId} - SUCCESS - Chat served`)
+    } else {
+      res.status(403).end('403 Forbidden')
+    }
+  } catch (error) {
+    console.error(error)
   }
 })
 
@@ -37,18 +39,39 @@ app.get('/api/chat/create', (req, res) => {
     locked: false,
   }
 
-  const chatIo = serverIo.of(`/${chatId}`)
+  try {
+    const chatIo = serverIo.of(`/${chatId}`)
 
-  chatIo.on('connection', socket => {
-    chatIo.emit('serverMessage', { fromServer: 'hello' })
+    chatIo.on('connection', socket => {
+      chatIo.emit('serverMessage', { fromServer: 'hello' })
 
-    socket.on('clientMessage', data => {
-      console.log(data)
+      socket.on('clientMessage', data => {
+        console.log(data)
+      })
     })
-  })
+  } catch (error) {
+    console.error(error)
+  }
 
-  console.log(`GET /api/chat/create - SUCCESS - ${chatId} created`)
-  res.json({ chatId })
+  try {
+    res.json({ chatId })
+    console.log(`GET /api/chat/create - SUCCESS - ${chatId} created`)
+    console.log('Current Chats:')
+    Object.keys(chats).forEach(chat => console.log(chat))
+  } catch (error) {
+    console.error(error)
+  }
+})
+
+app.get('/api/chat/lock/:chatId', (req, res) => {
+  const { chatId } = req.params
+
+  if (chats[chatId]) {
+    chats[chatId].locked = true
+    console.log(`GET /api/chat/lock/:chatId - SUCCESS - ${chatId} locked`)
+  } else {
+    console.error(`GET /api/chat/lock/:chatId - ERROR - ${chatId} does not exist`)
+  }
 })
 
 server.listen(PORT, error => {
@@ -58,3 +81,4 @@ server.listen(PORT, error => {
 
   console.log(`Server running on port ${PORT}`)
 })
+
