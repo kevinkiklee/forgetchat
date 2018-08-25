@@ -11,18 +11,8 @@ const PORT = process.env.PORT || 3001
 const chats = {}
 
 app.get('/app.html', (req, res) => res.status(403).end('403 Forbidden'))
+
 app.use(express.static(path.join(__dirname, '../../client/build')))
-
-app.get('/', (req, res) => {
-  const filePath = path.join(__dirname, '../../client/build/index.html')
-
-  try {
-    res.sendFile(filePath)
-    console.log(`GET / - SUCCESS - Homepage served`)
-  } catch (error) {
-    console.error(error)
-  }
-})
 
 app.get('/c/:chatId', (req, res) => {
   const { chatId } = req.params
