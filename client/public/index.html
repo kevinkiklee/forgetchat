@@ -1,14 +1,28 @@
 <!DOCTYPE html>
-<html lang='en'>
-  <head>
-    <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no'>
-    <meta name='theme-color' content='#000000'>
-    <link rel='shortcut icon' href='%PUBLIC_URL%/favicon.ico'>
-    <title>nothing.chat - secure non-logging chat</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id='root'></div>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>nothing.chat homepage</title>
+  <link rel="stylesheet" type="text/css" href="./style/index.css">
+  <script>
+    const button = document.querySelector('.generate__button')
+    const output = document.querySelector('.output__url')
+
+    button.addEventListener('click', event => {
+      fetch('api/create/chat')
+        .then(res => res.json())
+        .then(chatId => {
+          console.log(chatId)
+          output.innerHTML(`<a href='/c/${chatId}'>${chatId}</a>`)
+        })
+    })
+  </script>
+</head>
+<body>
+  <h1>nothing.chat</h1>
+  <div className='generate__button'>Generate Room</div>
+  <div className='output__url'></div>
+</body>
 </html>

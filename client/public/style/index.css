@@ -1,0 +1,13 @@
+@font-face {
+  font-family: lato;
+  src: url('../assets/lato.ttf');
+}
+
+@font-face {
+  font-family: lato;
+  src: url('../assets/raleway.ttf');
+}
+
+div {
+  font-family: lato;
+}
