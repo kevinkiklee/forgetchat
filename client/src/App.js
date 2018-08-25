@@ -1,14 +1,19 @@
-import React, { Component } from 'react';
-import './App.css';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import io from 'socket.io-client'
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <h1>nothing.chat</h1>
-      </div>
-    );
-  }
-}
+import './app.css'
+import Chat from './Chat'
 
-export default App;
+fetch('/api/chat/create')
+  .then(res => res.json())
+  .then(({ chatId }) => {
+    const socket = io.connect(`/${chatId}`)
+
+    socket.on('serverMessage', function (data) {
+      console.log(data)
+      socket.emit('clientMessage', { fromClient: 'hello' })
+    })
+  })
+
+ReactDOM.render(<Chat />, document.getElementById('root'))
