@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import setupSocketClient from './helpers/setupSocketClient'
+import setupSocketClient from '../helpers/setupSocketClient'
 import './Chat.css';
+import InfoPanel from './InfoPanel/InfoPanel';
+import MessagesPanel from './MessagesPanel/MessagesPanel';
 
 class Chat extends Component {
   state = {
@@ -24,7 +26,8 @@ class Chat extends Component {
 
     return isSocketClientReady
       ? <div className='chat-container'>
-          <h1>nothing.chat</h1>
+          <InfoPanel />
+          <MessagesPanel />
         </div>
       : <div className='chat-container'>
           <h1>connecting</h1>
