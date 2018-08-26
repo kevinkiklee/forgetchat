@@ -43,9 +43,9 @@ app.get('/api/create', (req, res) => {
     const chatIo = serverIo.of(`/${chatId}`)
 
     chatIo.on('connection', socket => {
-      chatIo.emit('serverMessage', { fromServer: 'hello' })
+      chatIo.emit('setup', { fromServer: 'hello' })
 
-      socket.on('clientMessage', data => {
+      socket.on('setup', data => {
         console.log(data)
       })
     })
