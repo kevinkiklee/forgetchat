@@ -21,7 +21,7 @@ app.get('/c/:chatId', (req, res) => {
     if (chats[chatId]) {
       const filePath = path.join(__dirname, '../../client/build/app.html')
       res.sendFile(filePath)
-      console.log(`GET /c/${req.params.chatId} - SUCCESS - Chat served`)
+      console.log(`GET /c/${chatId} - SUCCESS - ${chatId} served`)
     } else {
       res.status(403).end('403 Forbidden')
     }
@@ -30,7 +30,7 @@ app.get('/c/:chatId', (req, res) => {
   }
 })
 
-app.get('/api/chat/create', (req, res) => {
+app.get('/api/create', (req, res) => {
   const chatId = Math.random().toString(36).slice(2)
 
   chats[chatId] = {
@@ -43,9 +43,9 @@ app.get('/api/chat/create', (req, res) => {
     const chatIo = serverIo.of(`/${chatId}`)
 
     chatIo.on('connection', socket => {
-      chatIo.emit('serverMessage', { fromServer: 'hello' })
+      chatIo.emit('setup', { fromServer: 'hello' })
 
-      socket.on('clientMessage', data => {
+      socket.on('setup', data => {
         console.log(data)
       })
     })
@@ -55,7 +55,7 @@ app.get('/api/chat/create', (req, res) => {
 
   try {
     res.json({ chatId })
-    console.log(`GET /api/chat/create - SUCCESS - ${chatId} created`)
+    console.log(`GET /api/create - SUCCESS - ${chatId} created`)
     console.log('Current Chats:')
     Object.keys(chats).forEach(chat => console.log(chat))
   } catch (error) {
@@ -63,7 +63,19 @@ app.get('/api/chat/create', (req, res) => {
   }
 })
 
-app.get('/api/chat/lock/:chatId', (req, res) => {
+app.get('/api/validate/:chatId', (req, res) => {
+  const { chatId } = req.params
+  const isValid = !!chats[chatId]
+
+  try {
+    res.json({ isValid })
+    console.log(`GET /api/validate/${chatId} - SUCCESS - ${chatId} validated (result: ${isValid})`)
+  } catch (error) {
+    console.error(error)
+  }
+})
+
+app.get('/api/lock/:chatId', (req, res) => {
   const { chatId } = req.params
 
   if (chats[chatId]) {

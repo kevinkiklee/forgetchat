@@ -1,19 +1,27 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import io from 'socket.io-client'
 
 import './app.css'
 import Chat from './Chat'
 
-fetch('/api/chat/create')
-  .then(res => res.json())
-  .then(({ chatId }) => {
-    const socket = io.connect(`/${chatId}`)
+const chatId = window.location.pathname.split('/c/')[1]
 
-    socket.on('serverMessage', function (data) {
-      console.log(data)
-      socket.emit('clientMessage', { fromClient: 'hello' })
-    })
-  })
+const app = async () => {
+  try {
+    const response = await fetch(`/api/validate/${chatId}`)
 
-ReactDOM.render(<Chat />, document.getElementById('root'))
+    if (!response.ok) {
+      throw Error(response.statusText)
+    }
+
+    const { isValid } = await response.json()
+
+    if (isValid) {
+      ReactDOM.render(<Chat chatId={chatId} />, document.getElementById('root'))
+    }
+  } catch (error) {
+    throw Error(error)
+  }
+}
+
+app()

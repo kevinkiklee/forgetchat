@@ -16,7 +16,7 @@
     const output = document.querySelector('.output__url')
 
     button.addEventListener('click', event => {
-      fetch('api/chat/create')
+      fetch('api/create')
         .then(res => res.json())
         .then(({ chatId }) => {
           console.log({ chatId })
