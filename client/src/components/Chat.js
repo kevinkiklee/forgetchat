@@ -25,11 +25,13 @@ class Chat extends Component {
     const { isSocketClientReady } = this.state
 
     return isSocketClientReady
-      ? <div className='chat-container'>
-          <InfoPanel />
-          <MessagesPanel />
+      ? <div className='page-container'>
+          <div className='chat-container'>
+            <InfoPanel />
+            <MessagesPanel />
+          </div>
         </div>
-      : <div className='chat-container'>
+      : <div className='page-container'>
           <h1>connecting</h1>
         </div>
   }

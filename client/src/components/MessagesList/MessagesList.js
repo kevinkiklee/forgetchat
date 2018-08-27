@@ -5,7 +5,7 @@ class MessagesList extends Component {
   render() {
     return (
       <div className='messages-list-container'>
-        messages-container
+        messages-list
       </div>
     )
   }
