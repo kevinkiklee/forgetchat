@@ -17,14 +17,27 @@ app.use(express.static(path.join(__dirname, '../../client/build')))
 app.get('/c/:chatId', (req, res) => {
   const { chatId } = req.params
 
-  try {
-    if (chats[chatId]) {
-      const filePath = path.join(__dirname, '../../client/build/app.html')
-      res.sendFile(filePath)
-      console.log(`GET /c/${chatId} - SUCCESS - ${chatId} served`)
-    } else {
-      res.status(403).end('403 Forbidden')
-    }
+  if (chats[chatId]) {
+    const chatIo = serverIo.of(`/${chatId}`)
+
+    chatIo.on('connection', socket => {
+      chatIo.emit('setup', { fromServer: 'hello' })
+
+      socket.on('setup', data => {
+        console.log(data)
+      })
+
+      socket.on('message', data => {
+        console.log({data})
+      })
+    })
+
+    const filePath = path.join(__dirname, '../../client/build/app.html')
+    res.sendFile(filePath)
+    console.log(`GET /c/${chatId} - SUCCESS - ${chatId} served`)
+  } else {
+    res.status(403).end('403 Forbidden')
+  }
 })
 
 app.get('/api/create', (req, res) => {
@@ -36,32 +49,17 @@ app.get('/api/create', (req, res) => {
     locked: false,
   }
 
-  try {
-    const chatIo = serverIo.of(`/${chatId}`)
-
-    chatIo.on('connection', socket => {
-      chatIo.emit('setup', { fromServer: 'hello' })
-
-      socket.on('setup', data => {
-        console.log(data)
-      })
-    })
-  } catch (error) {
-    console.error(error)
-  }
-
-  try {
-    res.json({ chatId })
-    console.log(`GET /api/create - SUCCESS - ${chatId} created`)
-    console.log('Current Chats:')
-    Object.keys(chats).forEach(chat => console.log(chat))
+  res.json({ chatId })
+  console.log(`GET /api/create - SUCCESS - ${chatId} created`)
+  console.log('Current Chats:')
+  Object.keys(chats).forEach(chat => console.log(chat))
 })
 
 app.get('/api/validate/:chatId', (req, res) => {
   const { chatId } = req.params
   const isValid = !!chats[chatId]
 
-    res.json({ isValid })
+  res.json({ isValid })
 })
 
 app.get('/api/lock/:chatId', (req, res) => {
