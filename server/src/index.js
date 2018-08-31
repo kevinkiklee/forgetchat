@@ -8,7 +8,7 @@ const server = require('http').Server(app)
 const serverIo = io(server)
 
 const PORT = process.env.PORT || 3001
-const chats = {}
+const chats = { abc: true }
 
 app.get('/app.html', (req, res) => res.status(403).end('403 Forbidden'))
 
