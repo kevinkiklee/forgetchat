@@ -25,9 +25,6 @@ app.get('/c/:chatId', (req, res) => {
     } else {
       res.status(403).end('403 Forbidden')
     }
-  } catch (error) {
-    console.error(error)
-  }
 })
 
 app.get('/api/create', (req, res) => {
@@ -58,21 +55,13 @@ app.get('/api/create', (req, res) => {
     console.log(`GET /api/create - SUCCESS - ${chatId} created`)
     console.log('Current Chats:')
     Object.keys(chats).forEach(chat => console.log(chat))
-  } catch (error) {
-    console.error(error)
-  }
 })
 
 app.get('/api/validate/:chatId', (req, res) => {
   const { chatId } = req.params
   const isValid = !!chats[chatId]
 
-  try {
     res.json({ isValid })
-    console.log(`GET /api/validate/${chatId} - SUCCESS - ${chatId} validated (result: ${isValid})`)
-  } catch (error) {
-    console.error(error)
-  }
 })
 
 app.get('/api/lock/:chatId', (req, res) => {
