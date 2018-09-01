@@ -8,17 +8,22 @@ import Chat from './components/Chat'
 const chatId = window.location.pathname.split('/c/')[1]
 
 const app = async () => {
-  const response = await fetch(`/api/validate/${chatId}`)
+  try {
+    const response = await fetch(`/api/connect/${chatId}`)
 
-  if (!response.ok) {
-    throw Error(response.statusText)
-  }
+    if (!response.ok) {
+      throw Error(response.statusText)
+    }
 
-  const { isValid } = await response.json()
+    const { clientId } = await response.json()
 
-  if (isValid) {
-    ReactDOM.render(<Chat chatId={chatId} />, document.getElementById('root'))
-  } else {
+    if (clientId) {
+      console.log({clientId});
+      const initialStore = { chatId, clientId }
+
+      ReactDOM.render(<Chat store={initialStore} />, document.getElementById('root'))
+    }
+  } catch (error) {
     document.querySelector('#root').innerHTML = 'chatroom does not exist'
   }
 }

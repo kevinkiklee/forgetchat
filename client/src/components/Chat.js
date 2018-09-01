@@ -10,25 +10,41 @@ class Chat extends Component {
   }
 
   async componentDidMount() {
-    const { chatId } = this.props
+    const {
+      store: {
+        chatId,
+        clientId,
+      }
+    } = this.props
 
     try {
-      await setupSocketClient(chatId)
+      const { socketClient, isConnected } = await setupSocketClient({ chatId, clientId })
+      console.log({ isConnected })
+
+      if (isConnected) {
+        this.socketClient = socketClient
+        this.setState({ isSocketClientReady: true })
+      }
     } catch (error) {
       throw Error(error)
     }
+  }
 
-    this.setState({ isSocketClientReady: true })
+  async componentWillUnmount() {
+    if (this.state.isSocketClientReady) {
+      await window.socketClient.close()
+    }
   }
 
   render() {
     const { isSocketClientReady } = this.state
+    const { store } = this.props
 
     return isSocketClientReady
       ? <div className='page-container'>
           <div className='chat-container'>
-            <InfoPanel />
-            <MessagesPanel />
+            <InfoPanel store={store} />
+            <MessagesPanel store={store} socketClient={this.socketClient} />
           </div>
         </div>
       : <div className='page-container'>
