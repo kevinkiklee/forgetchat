@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom'
 import './reset.css'
 import './app.css'
 import Chat from './components/Chat'
+import Store from './store/Store'
 
 const chatId = window.location.pathname.split('/c/')[1]
 
@@ -18,10 +19,9 @@ const app = async () => {
     const { clientId } = await response.json()
 
     if (clientId) {
-      console.log({clientId});
-      const initialStore = { chatId, clientId }
+      const store = new Store({ chatId, clientId })
 
-      ReactDOM.render(<Chat store={initialStore} />, document.getElementById('root'))
+      ReactDOM.render(<Chat store={store} />, document.getElementById('root'))
     }
   } catch (error) {
     document.querySelector('#root').innerHTML = 'chatroom does not exist'
