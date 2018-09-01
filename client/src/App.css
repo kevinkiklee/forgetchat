@@ -1,7 +1,15 @@
+div {
+  border: 1px red solid
+}
+
+html, body, #root {
+  height: 100%;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 code, pre {
- font-family: Courier, monospace;
+  font-family: Courier, monospace;
 }

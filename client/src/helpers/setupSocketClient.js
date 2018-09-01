@@ -1,16 +1,14 @@
 import io from 'socket.io-client'
 
-const setupSocketClient = chatId => {
-  window.socketClient = io.connect(`/${chatId}`)
-  const socketClient = window.socketClient
+const setupSocketClient = ({ chatId, clientId }) => {
+  const socketClient = io.connect(`/${chatId}`)
 
   return new Promise((resolve, reject) => {
     try {
-      socketClient.on('setup', data => {
-        socketClient.emit('setup', { fromClient: 'hello' })
-        console.log({ data })
-        resolve(data)
-      }, this)
+      socketClient.emit('requestConnection', { chatId, clientId })
+      socketClient.on('clientConnected', ({ isConnected }) => {
+        resolve({ socketClient, isConnected })
+      })
     } catch(error) {
       console.error(error)
       reject(error)

@@ -3,12 +3,14 @@ const path = require('path')
 const express = require('express')
 const io = require('socket.io')
 
+const crypto = require('./crypto')
+
 const app = express()
 const server = require('http').Server(app)
-const serverIo = io(server)
+const socketIo = io(server)
 
 const PORT = process.env.PORT || 3001
-const chats = {}
+const chats = { abc: true }
 
 app.get('/app.html', (req, res) => res.status(403).end('403 Forbidden'))
 
@@ -17,61 +19,59 @@ app.use(express.static(path.join(__dirname, '../../client/build')))
 app.get('/c/:chatId', (req, res) => {
   const { chatId } = req.params
 
-  try {
-    if (chats[chatId]) {
-      const filePath = path.join(__dirname, '../../client/build/app.html')
-      res.sendFile(filePath)
-      console.log(`GET /c/${chatId} - SUCCESS - ${chatId} served`)
-    } else {
-      res.status(403).end('403 Forbidden')
-    }
-  } catch (error) {
-    console.error(error)
+  if (chats[chatId]) {
+    const filePath = path.join(__dirname, '../../client/build/app.html')
+    res.sendFile(filePath)
+    console.log(`GET /c/${chatId} - SUCCESS - ${chatId} served`)
+  } else {
+    res.status(403).end('403 Forbidden')
   }
 })
 
 app.get('/api/create', (req, res) => {
-  const chatId = Math.random().toString(36).slice(2)
+  const chatId = crypto.generateKey16()
 
   chats[chatId] = {
     created: true,
     createTime: (new Date()).getTime(),
     locked: false,
+    participants: []
   }
 
-  try {
-    const chatIo = serverIo.of(`/${chatId}`)
+  const chatIo = socketIo.of(`/${chatId}`)
 
-    chatIo.on('connection', socket => {
-      chatIo.emit('setup', { fromServer: 'hello' })
+  chatIo.on('connection', socket => {
+    socket.on('requestConnection', ({ clientId }) => {
+      if (chats[chatId] && chats[chatId].participants.includes(clientId)) {
+        socket.emit('clientConnected', { isConnected: true })
 
-      socket.on('setup', data => {
-        console.log(data)
-      })
+        socket.on('message', ({ author, body }, callback) => {
+          console.log(`!!! From ${author} - ${body}`)
+          socket.broadcast.emit('relayedMessage', { author, body })
+          callback({ author, body })
+        })
+      }
     })
-  } catch (error) {
-    console.error(error)
-  }
+  })
 
-  try {
-    res.json({ chatId })
-    console.log(`GET /api/create - SUCCESS - ${chatId} created`)
-    console.log('Current Chats:')
-    Object.keys(chats).forEach(chat => console.log(chat))
-  } catch (error) {
-    console.error(error)
-  }
+  res.json({ chatId })
+  console.log(`GET /api/create - SUCCESS - ${chatId} created`)
+  console.log('Current Chats:')
+  Object.keys(chats).forEach(chat => console.log(chat))
 })
 
-app.get('/api/validate/:chatId', (req, res) => {
+app.get('/api/connect/:chatId', (req, res) => {
   const { chatId } = req.params
-  const isValid = !!chats[chatId]
 
-  try {
-    res.json({ isValid })
-    console.log(`GET /api/validate/${chatId} - SUCCESS - ${chatId} validated (result: ${isValid})`)
-  } catch (error) {
-    console.error(error)
+  if (chats[chatId]) {
+    const clientId = crypto.generateKey16()
+    chats[chatId].participants.push(clientId)
+
+    console.log({ participants: chats[chatId].participants })
+
+    res.json({ clientId })
+  } else {
+    res.status(403).end('403 Forbidden')
   }
 })
 

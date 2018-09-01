@@ -1,0 +1,11 @@
+.page-container {
+  display: flex;
+  height: 100%;
+  justify-content: center;
+}
+
+.chat-container {
+  display: flex;
+  width: 1000px;
+  height: 100%;
+}
