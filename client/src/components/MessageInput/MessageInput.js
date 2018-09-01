@@ -3,10 +3,17 @@ import React, { Component } from 'react'
 import './MessageInput.css'
 
 class MessageInput extends Component {
-  socketClient = window.socketClient
-
   state = {
     messageBody: ''
+  }
+
+  updateMessages =  ({ author, body }) => {
+    this.props.updateMessages({
+      author: this.props.store.clientId,
+      body: this.state.messageBody
+    })
+
+    this.setState({ messageBody: '' })
   }
 
   handleChange = event => {
@@ -14,10 +21,10 @@ class MessageInput extends Component {
   }
 
   handleSubmit = event => {
-    this.socketClient.emit('message', {
-      sender: 'abc',
-      messageBody: this.state.messageBody
-    })
+    this.props.socketClient.emit('message', {
+      author: this.props.store.clientId,
+      body: this.state.messageBody
+    }, this.updateMessages)
 
     event.preventDefault()
   }
