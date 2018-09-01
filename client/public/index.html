@@ -15,14 +15,21 @@
     const button = document.querySelector('.generate__button')
     const output = document.querySelector('.output__url')
 
-    button.addEventListener('click', event => {
-      fetch('api/create')
-        .then(res => res.json())
-        .then(({ chatId }) => {
-          console.log({ chatId })
-          output.innerHTML = `<a href='/c/${chatId}'>${chatId}</a>`
-        })
-    })
+    // button.addEventListener('click', event => {
+    //   fetch('api/create')
+    //     .then(res => res.json())
+    //     .then(({ chatId }) => {
+    //       console.log({ chatId })
+    //       output.innerHTML = `<a href='/c/${chatId}'>${chatId}</a>`
+    //     })
+    // })
+
+    fetch('api/create')
+      .then(res => res.json())
+      .then(({ chatId }) => {
+        console.log({ chatId })
+        output.innerHTML = `<a href='http://localhost:3000/c/${chatId}'>${chatId}</a>`
+      })
   </script>
 </body>
 </html>
