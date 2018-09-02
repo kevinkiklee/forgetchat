@@ -1,8 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
+import { connect } from 'react-redux'
+
 import setupSocketClient from '../helpers/setupSocketClient'
-import './Chat.css';
-import InfoPanel from './InfoPanel/InfoPanel';
-import MessagesPanel from './MessagesPanel/MessagesPanel';
+import { receiveMessage } from '../helpers/actions'
+import './Chat.css'
+import InfoPanel from './InfoPanel/InfoPanel'
+import MessagesPanel from './MessagesPanel/MessagesPanel'
 
 class Chat extends Component {
   state = {
@@ -11,22 +14,18 @@ class Chat extends Component {
 
   async componentDidMount() {
     const {
-      store: {
+      app: {
         chatId,
         clientId,
-      }
+      },
+      receiveMessage,
     } = this.props
 
-    try {
-      const { socketClient, isConnected } = await setupSocketClient({ chatId, clientId })
-      console.log({ isConnected })
+    const { socketClient, isConnected } = await setupSocketClient({ chatId, clientId, receiveMessage })
 
-      if (isConnected) {
-        this.socketClient = socketClient
-        this.setState({ isSocketClientReady: true })
-      }
-    } catch (error) {
-      throw Error(error)
+    if (isConnected) {
+      this.socketClient = socketClient
+      this.setState({ isSocketClientReady: true })
     }
   }
 
@@ -38,13 +37,12 @@ class Chat extends Component {
 
   render() {
     const { isSocketClientReady } = this.state
-    const { store } = this.props
 
     return isSocketClientReady
       ? <div className='page-container'>
           <div className='chat-container'>
-            <InfoPanel store={store} />
-            <MessagesPanel store={store} socketClient={this.socketClient} />
+            <InfoPanel />
+            <MessagesPanel socketClient={this.socketClient} />
           </div>
         </div>
       : <div className='page-container'>
@@ -53,4 +51,9 @@ class Chat extends Component {
   }
 }
 
-export default Chat;
+const mapStateToProps = ({ app, messages }) => ({ app, messages })
+const mapDispatchToProps = dispatch => ({
+  receiveMessage: payload => dispatch(receiveMessage(payload)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Chat)
