@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
 
 import Message from '../Message/Message'
 import './MessagesList.css';
@@ -23,4 +24,6 @@ class MessagesList extends Component {
   }
 }
 
-export default MessagesList;
+const mapStateToProps = ({ messages }) => ({ messages })
+
+export default connect(mapStateToProps)(MessagesList)
