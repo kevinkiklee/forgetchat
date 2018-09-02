@@ -1,10 +1,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { Provider } from 'react-redux'
+import setupStore from './helpers/setupStore'
 
 import './reset.css'
 import './app.css'
 import Chat from './components/Chat'
-import Store from './store/Store'
 
 const chatId = window.location.pathname.split('/c/')[1]
 
@@ -19,9 +20,14 @@ const app = async () => {
     const { clientId } = await response.json()
 
     if (clientId) {
-      const store = new Store({ chatId, clientId })
+      const store = setupStore({ chatId, clientId })
 
-      ReactDOM.render(<Chat store={store} />, document.getElementById('root'))
+      ReactDOM.render(
+        <Provider store={store}>
+          <Chat />
+        </Provider>,
+        document.getElementById('root')
+      )
     }
   } catch (error) {
     document.querySelector('#root').innerHTML = 'chatroom does not exist'
