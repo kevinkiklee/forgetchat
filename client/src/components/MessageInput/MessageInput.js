@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-
+import { connect } from 'react-redux'
+import { sendMessage } from '../../helpers/actions'
 import './MessageInput.css'
 
 class MessageInput extends Component {
@@ -10,10 +11,8 @@ class MessageInput extends Component {
   updateMessages =  ({ author, body }) => {
     this.props.updateMessages({
       author: this.props.store.clientId,
-      body: this.state.messageBody
+      body: this.state.messageBody,
     })
-
-    this.setState({ messageBody: '' })
   }
 
   handleChange = event => {
@@ -21,12 +20,24 @@ class MessageInput extends Component {
   }
 
   handleSubmit = event => {
-    this.props.socketClient.emit('message', {
-      author: this.props.store.clientId,
-      body: this.state.messageBody
-    }, this.updateMessages)
-
     event.preventDefault()
+
+    const {
+      socketClient,
+      sendMessage,
+      app: {
+        clientId,
+      },
+    } = this.props
+
+    const message = {
+      author: clientId,
+      body: this.state.messageBody
+    }
+
+    sendMessage({ message, socketClient })
+
+    this.setState({ messageBody: '' })
   }
 
   render = () => {
@@ -39,4 +50,9 @@ class MessageInput extends Component {
   }
 }
 
-export default MessageInput
+const mapStateToProps = ({ app, messages }) => ({ app, messages })
+const mapDispatchToProps = dispatch => ({
+  sendMessage: payload => dispatch(sendMessage(payload)),
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(MessageInput)
